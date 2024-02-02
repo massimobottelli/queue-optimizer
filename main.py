@@ -1,7 +1,8 @@
-import time
+from prettytable import PrettyTable
 
-DELAY_SECONDS = 3
+DELAY_SECONDS = 10
 SKIERS_PER_BOARDING = 4
+
 
 def get_positive_number(prompt):
     while True:
@@ -14,42 +15,80 @@ def get_positive_number(prompt):
         except ValueError:
             print("Please insert a valid number.")
 
+
 def get_current_queue_and_rate(station_name):
+    # Get current queue and boarding rate for a given station
     current_queue = get_positive_number(f"How many skiers are currently in the {station_name} station queue? ")
     board_per_minute = get_positive_number(f"How many skiers board per minute at {station_name} station? ")
     return current_queue, board_per_minute
 
-def board_skiers(current_queue, board_per_minute, num_to_board):
+
+def add_new_skiers(current_queue, board_per_minute):
+    # Add new skiers to the queue based on the boarding rate
+    return int(current_queue + (board_per_minute * DELAY_SECONDS / 60))
+
+
+def board_skiers(current_queue, num_to_board):
+    # Board a specified number of skiers from the queue
     boarded = min(num_to_board, current_queue)
     remaining_queue = max(0, current_queue - boarded)
     return remaining_queue, boarded
 
-def add_new_skiers(current_queue, board_per_minute):
-    updated_current_queue = int(current_queue + (board_per_minute * DELAY_SECONDS / 60))
-    return updated_current_queue
+
+def display_table(counter, partial_counter, periodicity, bottom_current_queue, bottom_boarded,
+                  intermediate_current_queue, intermediate_boarded):
+    # Display a table with relevant information
+    table = PrettyTable()
+    table.field_names = ["Station", "Queue", "Boarded"]
+    table.add_row(["Bottom", bottom_current_queue, bottom_boarded])
+    table.add_row(["Intermediate", intermediate_current_queue, intermediate_boarded])
+
+    print(f'\nBoarding: {counter}')
+    print(f'Partial: {partial_counter}')
+    print(f'Periodicity: {periodicity}')
+    print(table)
+
 
 if __name__ == '__main__':
+    # Get initial values for bottom and intermediate stations
     bottom_current_queue, bottom_board_per_minute = get_current_queue_and_rate("bottom")
     intermediate_current_queue, intermediate_board_per_minute = get_current_queue_and_rate("intermediate")
 
-    for _ in range(10):
+    # Get the boarding periodicity from the user
+    periodicity = int(get_positive_number("Every how many chairs should I leave one empty? "))
 
-        # Add new skiers to the queues
+    counter = 0
+    partial_counter = 0
+
+    # Create the table
+    table = PrettyTable()
+    table.field_names = ["Station", "Queue", "Boarded"]
+
+    while True:
+        # Increment counters
+        counter += 1
+        partial_counter += 1
+
+        # Update the queues with new skiers
         bottom_current_queue = add_new_skiers(bottom_current_queue, bottom_board_per_minute)
         intermediate_current_queue = add_new_skiers(intermediate_current_queue, intermediate_board_per_minute)
 
-        # Board SKIERS_PER_BOARDING skiers at the bottom station
-        bottom_current_queue, boarded_bottom = board_skiers(bottom_current_queue, bottom_board_per_minute, SKIERS_PER_BOARDING)
+        # Board skiers based on the periodicity
+        if partial_counter < periodicity:
+            bottom_current_queue, bottom_boarded = board_skiers(bottom_current_queue, SKIERS_PER_BOARDING)
+            intermediate_boarded = 0
+        else:
+            bottom_boarded = 0
+            intermediate_current_queue, intermediate_boarded = board_skiers(intermediate_current_queue,
+                                                                            SKIERS_PER_BOARDING)
+            partial_counter = 0
 
+        # Display the table with the latest values
+        display_table(counter, partial_counter, periodicity, bottom_current_queue, bottom_boarded,
+                      intermediate_current_queue, intermediate_boarded)
 
-        # Display current queue states and the number of skiers that boarded
-        print("\nBottom Station:")
-        print(" - Queue:", bottom_current_queue)
-        print(" - Boarded:", boarded_bottom)
-        print("Intermediate Station")
-        print(" - Queue:", intermediate_current_queue)
-        print(" - Boarded:")
-
-        time.sleep(DELAY_SECONDS)
-
-    print("\nSimulation complete.")
+        # Check for user input to exit the simulation
+        user_input = input("Press Enter to continue, 'q' to exit: ").lower()
+        if user_input == 'q':
+            print("\nSimulation stopped.")
+            break
