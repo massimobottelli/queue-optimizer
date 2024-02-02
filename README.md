@@ -8,4 +8,4 @@ If all the chairs are used by skiers boarding at the bottom station, there is no
 
 The user provides the current queues, the queue rates (skiers per minute) and how many chairs should be left empty at the bottom stop (for example, one empty chair for every three chairs); the goal is to  balance the queues at the two stations.
 
-![Queue optimizer](/doc/sample.png)
+![Queue optimizer](/doc/sample-1.png)
