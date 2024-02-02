@@ -1,4 +1,3 @@
-from prettytable import PrettyTable
 import time
 
 DELAY_SECONDS = 10
