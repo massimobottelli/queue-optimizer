@@ -36,13 +36,13 @@ def board_skiers(current_queue, num_to_board):
     return remaining_queue, boarded
 
 
-def text_bar_chart(data, labels, boarding):
+def text_bar_chart(labels, data, adding, boarding):
     max_value = max(data)
     scale_factor = 40 / max_value  # Factor for the desired width
 
-    for boarded, label, value in zip(boarding, labels, data):
+    for label, value, added, boarded in zip(labels, data, adding, boarding):
         bar = '#' * int(value * scale_factor)
-        print(f"{label}: {value} {bar} {boarded}")
+        print(f"{label}: {value} | {boarded} {bar} +{added}")
 
 
 if __name__ == '__main__':
@@ -61,6 +61,8 @@ if __name__ == '__main__':
     # Create the table
     table = PrettyTable()
     table.field_names = ["Station", "Queue", "Boarded"]
+
+    print ("\nFormat: <station>: <current queue> | <boarding> ###### <adding to queue>")
 
     while True:
         # Increment counters
@@ -84,9 +86,10 @@ if __name__ == '__main__':
         # Prepare data for graph
         data = [bottom_current_queue, intermediate_current_queue]
         boarding = [-bottom_boarded, -intermediate_boarded]
+        adding = [int(bottom_board_per_minute * DELAY_SECONDS / 60), int(intermediate_board_per_minute * DELAY_SECONDS / 60)]
 
         # Create and display the text-based bar chart
         print()
-        text_bar_chart(data, labels, boarding)
+        text_bar_chart(labels, data, adding, boarding)
 
         time.sleep(2)
