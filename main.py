@@ -1,4 +1,5 @@
 from prettytable import PrettyTable
+import time
 
 DELAY_SECONDS = 10
 SKIERS_PER_BOARDING = 4
@@ -35,18 +36,13 @@ def board_skiers(current_queue, num_to_board):
     return remaining_queue, boarded
 
 
-def display_table(counter, partial_counter, periodicity, bottom_current_queue, bottom_boarded,
-                  intermediate_current_queue, intermediate_boarded):
-    # Display a table with relevant information
-    table = PrettyTable()
-    table.field_names = ["Station", "Queue", "Boarded"]
-    table.add_row(["Bottom", bottom_current_queue, bottom_boarded])
-    table.add_row(["Intermediate", intermediate_current_queue, intermediate_boarded])
+def text_bar_chart(data, labels, boarding):
+    max_value = max(data)
+    scale_factor = 40 / max_value  # Factor for the desired width
 
-    print(f'\nBoarding: {counter}')
-    print(f'Partial: {partial_counter}')
-    print(f'Periodicity: {periodicity}')
-    print(table)
+    for boarded, label, value in zip(boarding, labels, data):
+        bar = '#' * int(value * scale_factor)
+        print(f"{label}: {value} {bar} {boarded}")
 
 
 if __name__ == '__main__':
@@ -59,6 +55,8 @@ if __name__ == '__main__':
 
     counter = 0
     partial_counter = 0
+
+    labels = ['Interm', 'Bottom']
 
     # Create the table
     table = PrettyTable()
@@ -83,12 +81,12 @@ if __name__ == '__main__':
                                                                             SKIERS_PER_BOARDING)
             partial_counter = 0
 
-        # Display the table with the latest values
-        display_table(counter, partial_counter, periodicity, bottom_current_queue, bottom_boarded,
-                      intermediate_current_queue, intermediate_boarded)
+        # Prepare data for graph
+        data = [bottom_current_queue, intermediate_current_queue]
+        boarding = [-bottom_boarded, -intermediate_boarded]
 
-        # Check for user input to exit the simulation
-        user_input = input("Press Enter to continue, 'q' to exit: ").lower()
-        if user_input == 'q':
-            print("\nSimulation stopped.")
-            break
+        # Create and display the text-based bar chart
+        print()
+        text_bar_chart(data, labels, boarding)
+
+        time.sleep(2)
