@@ -1,4 +1,4 @@
-# Queue optimizer
+# Ski Chairlift Queue Optimizer
 
 This script implements an algorithm to balance the two queues of the chairlift for skiers.
 
