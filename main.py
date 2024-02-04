@@ -1,3 +1,5 @@
+# Ski Chairlift Queue Optimizer
+
 import pygame
 
 DELAY_SECONDS = 10
@@ -114,7 +116,7 @@ if __name__ == '__main__':
     # Set up the window
     window_width, window_height = window_size
     window = pygame.display.set_mode((window_width, window_height))
-    pygame.display.set_caption("Moving Circle Animation")
+    pygame.display.set_caption("Ski Chairlift Queue Optimizer")
 
     # Set up the line
     line_start = (0, window_height)
